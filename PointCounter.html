@@ -1,113 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Point Counter</title>
+    <style>
+        body {
+            background: black;
+            font-family: Arial, sans-serif;
+            color: aliceblue;
+            margin: 20px;
+            text-align: center;
+        }
+
+        input, button {
+            font-size: 18px;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .counter {
+            font-size: 18px;
+            margin: 0 10px;
+            color: white;
+        }
+
+        #globalControls {
+            display: none;
+            margin-top: 15px;
+        }
+
+        #tableWrapper {
+            overflow-x: auto;
+        }
+    </style>
 </head>
-<style>
-    body {
-    background: rgb(0, 0, 0);
-    }
-
-    h3 {
-        color:aliceblue;
-    }
-
-    p {
-        color:aliceblue;
-    }
-
-    input {
-    margin: 5px;
-    padding: 5px;
-    width: 60px;
-    }
-        
-    table {
-    border-collapse: collapse;
-    margin: 20px auto;  /* centers the table horizontally */
-    }
-
-    td {
-    border: 1px solid rgb(255, 255, 255);
-    padding: 10px;
-    text-align: center; /* centers content inside cells */
-    }
-
-    button {
-    padding: 6px 12px;
-    cursor: pointer;
-    }
-
-    span {
-        color:aliceblue
-    }
-
-    #globalControls {
-        border: 1px solid black;
-        padding: 10px;
-        text-align: center; /* centers buttons and counters inside cells */
-    }
-</style>
 <body>
     <h3>Point Counter</h3>
-        <p>Rows:</p> <input type="number" id="rowsInput" min="1" value="4">
-    <p>Columns:</p> <input type="number" id="colsInput" min="1" value="8">
-    <button onclick="generateTable()">Generate Table</button>
 
-    <table id="dynamicTable"></table>
+    <p>Rows: <input type="number" id="rowsInput" min="1" value="4"></p>
+    <p>Columns: <input type="number" id="colsInput" min="1" value="8"></p>
+    <button id="generateBtn">Generate Table</button>
 
-    <div id="globalControls" style="display:none; margin-top:15px;">
-        <button onclick="increaseAllCounters()">ALL+1</button>
-        <button onclick="decreaseAllCounters()">ALL-1</button>
+    <div id="tableWrapper">
+        <table id="dynamicTable"></table>
+    </div>
+
+    <div id="globalControls">
+        <button id="allPlus">ALL+1</button>
+        <button id="allMinus">ALL-1</button>
     </div>
 
     <script>
-        // Increase all counters
+        const table = document.getElementById("dynamicTable");
+        const globalControls = document.getElementById("globalControls");
+
         function increaseAllCounters() {
-            let counters = document.querySelectorAll(".counter");
-            counters.forEach(counter => {
+            document.querySelectorAll(".counter").forEach(counter => {
                 counter.textContent = parseInt(counter.textContent) + 1;
             });
         }
 
-        // Decrease all counters
         function decreaseAllCounters() {
-            let counters = document.querySelectorAll(".counter");
-            counters.forEach(counter => {
+            document.querySelectorAll(".counter").forEach(counter => {
                 let value = parseInt(counter.textContent);
-                if (value > 0) {
-                    counter.textContent = value - 1;
-                }
+                if (value > 0) counter.textContent = value - 1;
             });
         }
+
+        document.getElementById("allPlus").addEventListener("click", increaseAllCounters);
+        document.getElementById("allMinus").addEventListener("click", decreaseAllCounters);
 
         function generateTable() {
             const rows = parseInt(document.getElementById("rowsInput").value);
             const cols = parseInt(document.getElementById("colsInput").value);
-            const table = document.getElementById("dynamicTable");
 
-            // Clear old table
             table.innerHTML = "";
 
-            // Build new table
             for (let r = 1; r <= rows; r++) {
                 let row = document.createElement("tr");
 
                 for (let c = 1; c <= cols; c++) {
                     let cell = document.createElement("td");
 
-                    // Editable label button
                     let labelBtn = document.createElement("button");
-                    labelBtn.textContent = `student row ${r}, column ${c}`;
+                    labelBtn.textContent = `Student ${r},${c}`;
                     labelBtn.style.marginRight = "10px";
 
-                    // Make button text editable on click
-                    labelBtn.onclick = () => {
+                    labelBtn.addEventListener("click", () => {
                         let input = document.createElement("input");
                         input.type = "text";
                         input.value = labelBtn.textContent;
-                        input.style.width = "100px";
+                        input.style.width = "120px";
 
                         cell.replaceChild(input, labelBtn);
                         input.focus();
@@ -116,37 +115,29 @@
                             labelBtn.textContent = input.value || "Unnamed";
                             cell.replaceChild(labelBtn, input);
                         };
-                        input.onblur = save;
-                        input.onkeypress = (e) => {
-                            if (e.key === "Enter") save();
-                        };
-                    };
 
-                    // Counter display
+                        input.onblur = save;
+                        input.onkeypress = (e) => { if (e.key === "Enter") save(); };
+                    });
+
                     let counter = document.createElement("span");
                     counter.textContent = "0";
                     counter.className = "counter";
-                    counter.style.margin = "0 8px";
 
-                    // Increase button
                     let plusBtn = document.createElement("button");
                     plusBtn.textContent = "+";
-                    plusBtn.onclick = () => {
+                    plusBtn.addEventListener("click", () => {
                         counter.textContent = parseInt(counter.textContent) + 1;
-                    };
+                    });
 
-                    // Decrease button
                     let minusBtn = document.createElement("button");
                     minusBtn.textContent = "-";
                     minusBtn.style.marginLeft = "5px";
-                    minusBtn.onclick = () => {
+                    minusBtn.addEventListener("click", () => {
                         let value = parseInt(counter.textContent);
-                        if (value > 0) {
-                            counter.textContent = value - 1;
-                        }
-                    };
+                        if (value > 0) counter.textContent = value - 1;
+                    });
 
-                    // Append all elements
                     cell.appendChild(labelBtn);
                     cell.appendChild(counter);
                     cell.appendChild(plusBtn);
@@ -158,36 +149,13 @@
                 table.appendChild(row);
             }
 
-            // Show global controls after generating table
-            document.getElementById("globalControls").style.display = "block";
+            globalControls.style.display = "block";
         }
 
-        labelBtn.addEventListener("click", makeEditable);
-labelBtn.addEventListener("touchstart", makeEditable);
-
-function makeEditable(e) {
-    e.preventDefault(); // prevent double triggering
-    let input = document.createElement("input");
-    input.type = "text";
-    input.value = labelBtn.textContent;
-    input.style.width = "100px";
-
-    cell.replaceChild(input, labelBtn);
-    input.focus();
-
-    const save = () => {
-        labelBtn.textContent = input.value || "Unnamed";
-        cell.replaceChild(labelBtn, input);
-    };
-    input.onblur = save;
-    input.onkeypress = (e) => {
-        if (e.key === "Enter") save();
-    };
-}
-
-        
-        plusBtn.addEventListener("click", incrementCounter);
-        plusBtn.addEventListener("touchstart", incrementCounter);
+        document.getElementById("generateBtn").addEventListener("click", generateTable);
+    </script>
+</body>
+</html>
 
         function incrementCounter(e) {
             e.preventDefault();
