@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Counter</title>
+</head>
+<style>
+    body {
+    background: rgb(0, 0, 0);
+    }
+
+    h3 {
+        color:aliceblue;
+    }
+
+    p {
+        color:aliceblue;
+    }
+
+    input {
+    margin: 5px;
+    padding: 5px;
+    width: 60px;
+    }
+        
+    table {
+    border-collapse: collapse;
+    margin: 20px auto;  /* centers the table horizontally */
+    }
+
+    td {
+    border: 1px solid rgb(255, 255, 255);
+    padding: 10px;
+    text-align: center; /* centers content inside cells */
+    }
+
+    button {
+    padding: 6px 12px;
+    cursor: pointer;
+    }
+
+    span {
+        color:aliceblue
+    }
+
+    #globalControls {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center; /* centers buttons and counters inside cells */
+    }
+</style>
+<body>
+    <h3>Point Counter</h3>
+        <p>Rows:</p> <input type="number" id="rowsInput" min="1" value="4">
+    <p>Columns:</p> <input type="number" id="colsInput" min="1" value="8">
+    <button onclick="generateTable()">Generate Table</button>
+
+    <table id="dynamicTable"></table>
+
+    <div id="globalControls" style="display:none; margin-top:15px;">
+        <button onclick="increaseAllCounters()">ALL+1</button>
+        <button onclick="decreaseAllCounters()">ALL-1</button>
+    </div>
+
+    <script>
+        // Increase all counters
+        function increaseAllCounters() {
+            let counters = document.querySelectorAll(".counter");
+            counters.forEach(counter => {
+                counter.textContent = parseInt(counter.textContent) + 1;
+            });
+        }
+
+        // Decrease all counters
+        function decreaseAllCounters() {
+            let counters = document.querySelectorAll(".counter");
+            counters.forEach(counter => {
+                let value = parseInt(counter.textContent);
+                if (value > 0) {
+                    counter.textContent = value - 1;
+                }
+            });
+        }
+
+        function generateTable() {
+            const rows = parseInt(document.getElementById("rowsInput").value);
+            const cols = parseInt(document.getElementById("colsInput").value);
+            const table = document.getElementById("dynamicTable");
+
+            // Clear old table
+            table.innerHTML = "";
+
+            // Build new table
+            for (let r = 1; r <= rows; r++) {
+                let row = document.createElement("tr");
+
+                for (let c = 1; c <= cols; c++) {
+                    let cell = document.createElement("td");
+
+                    // Editable label button
+                    let labelBtn = document.createElement("button");
+                    labelBtn.textContent = `student row ${r}, column ${c}`;
+                    labelBtn.style.marginRight = "10px";
+
+                    // Make button text editable on click
+                    labelBtn.onclick = () => {
+                        let input = document.createElement("input");
+                        input.type = "text";
+                        input.value = labelBtn.textContent;
+                        input.style.width = "100px";
+
+                        cell.replaceChild(input, labelBtn);
+                        input.focus();
+
+                        const save = () => {
+                            labelBtn.textContent = input.value || "Unnamed";
+                            cell.replaceChild(labelBtn, input);
+                        };
+                        input.onblur = save;
+                        input.onkeypress = (e) => {
+                            if (e.key === "Enter") save();
+                        };
+                    };
+
+                    // Counter display
+                    let counter = document.createElement("span");
+                    counter.textContent = "0";
+                    counter.className = "counter";
+                    counter.style.margin = "0 8px";
+
+                    // Increase button
+                    let plusBtn = document.createElement("button");
+                    plusBtn.textContent = "+";
+                    plusBtn.onclick = () => {
+                        counter.textContent = parseInt(counter.textContent) + 1;
+                    };
+
+                    // Decrease button
+                    let minusBtn = document.createElement("button");
+                    minusBtn.textContent = "-";
+                    minusBtn.style.marginLeft = "5px";
+                    minusBtn.onclick = () => {
+                        let value = parseInt(counter.textContent);
+                        if (value > 0) {
+                            counter.textContent = value - 1;
+                        }
+                    };
+
+                    // Append all elements
+                    cell.appendChild(labelBtn);
+                    cell.appendChild(counter);
+                    cell.appendChild(plusBtn);
+                    cell.appendChild(minusBtn);
+
+                    row.appendChild(cell);
+                }
+
+                table.appendChild(row);
+            }
+
+            // Show global controls after generating table
+            document.getElementById("globalControls").style.display = "block";
+        }
+
+        labelBtn.addEventListener("click", makeEditable);
+labelBtn.addEventListener("touchstart", makeEditable);
+
+function makeEditable(e) {
+    e.preventDefault(); // prevent double triggering
+    let input = document.createElement("input");
+    input.type = "text";
+    input.value = labelBtn.textContent;
+    input.style.width = "100px";
+
+    cell.replaceChild(input, labelBtn);
+    input.focus();
+
+    const save = () => {
+        labelBtn.textContent = input.value || "Unnamed";
+        cell.replaceChild(labelBtn, input);
+    };
+    input.onblur = save;
+    input.onkeypress = (e) => {
+        if (e.key === "Enter") save();
+    };
+}
+
+        
+        plusBtn.addEventListener("click", incrementCounter);
+        plusBtn.addEventListener("touchstart", incrementCounter);
+
+        function incrementCounter(e) {
+            e.preventDefault();
+            counter.textContent = parseInt(counter.textContent) + 1;
+        }
+    </script>
+</body>
+</html>
